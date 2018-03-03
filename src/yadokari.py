@@ -1,5 +1,15 @@
 import click
 
+RESERVATION_INFO = '''
+*** YOUR INFORMATION ***
+0. check in date: {check_in_date}
+1. check out date: {check_out_date}
+2. your name: {name}
+3. email address: {email}
+4. how many people: {num_of_pople}
+************************
+'''
+
 
 @click.group()
 def cmd():
@@ -30,25 +40,36 @@ def cal(context, year, month):
     print(calendar.month(year, month))
 
 
+VALUE_TO_PROMPT = [
+    ('check_in_date', lambda: click.prompt('check in date')),
+    ('check_out_date', lambda: click.prompt('check out date')),
+    ('name', lambda: click.prompt('your name')),
+    ('email', lambda: click.prompt('email address')),
+    ('num_of_pople', lambda: click.prompt('how many people')),
+]
+
+
 @cmd.command()
 @click.argument('context', nargs=-1)
-@click.option('--check_in_date', prompt='check in date',
-               help='check in date')
-@click.option('--check_out_date', prompt='check out date',
-               help='check out date')
-@click.option('--name', prompt='your name',
-               help='your name')
-@click.option('--email', prompt='email address',
-               help='email address')
-@click.option('--num_of_people', prompt='how many people',
-               help='how many people')
-def reserve(context, check_in_date, check_out_date, name, email, num_of_people):
+def reserve(context):
     """宿の予約を行う """
-    click.echo(check_out_date)
-    click.echo(check_in_date)
-    click.echo(name)
-    click.echo(email)
-    click.echo(num_of_people)
+    info = {}
+    for i, m in VALUE_TO_PROMPT:
+        info[i] = m()
+
+    click.echo(RESERVATION_INFO.format(**info))
+    confirm = click.prompt('confirm(Y/y) or edit(0-{}): '.format(len(VALUE_TO_PROMPT)))
+    while confirm not in ('Y', 'y', 'YES', 'Yes', 'yes'):
+        try:
+            confirm = int(confirm)
+            i, m = VALUE_TO_PROMPT[confirm]
+            info[i] = m()
+        except:
+            pass
+        click.echo(RESERVATION_INFO.format(**info))
+        confirm = click.prompt('confirm(Y/y) or edit(0-{}): '.format(len(VALUE_TO_PROMPT)))
+    click.echo('done!!')
+
 
 def main():
     cmd()
@@ -56,4 +77,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
