@@ -94,7 +94,7 @@ def get_reservation_info():
 
 
 @cmd.command()
-@click.argument('token', nargs=-1)
+@click.argument('token', nargs=1)
 def me(token):
     """トークンから予約情報を受け取る """
     if not token:
