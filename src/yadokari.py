@@ -62,8 +62,10 @@ def cal(context, year, month):
 @click.argument('context', nargs=-1)
 def reserve(context):
     """宿の予約を行う """
+    if not context:
+        context = 1
     info = get_reservation_info()
-    res = requests.post(BASE_URL + 'api/v1/yados/1/reservations',
+    res = requests.post(BASE_URL + f'api/v1/yados/{context}/reservations',
                         data={f'reservation[{k}]': v for k, v in info.items()})
     click.echo(res.content)
     click.echo('done!!')
