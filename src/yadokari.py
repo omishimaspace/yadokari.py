@@ -49,13 +49,14 @@ def show(context):
 
 
 @cmd.command()
-@click.argument('context', nargs=-1)
-@click.option('--month', '-m', default=1)
-@click.option('--year', '-y', default=2018)
+@click.argument('context', nargs=1)
 def cal(context, year, month):
     """宿の予約状況を表示 """
-    import calendar
-    print(calendar.month(year, month))
+    if not context:
+        context = 1
+    res = requests.get(BASE_URL + '/api/v1/yados/{context}/schedules')
+    reservations = json.loads(res.content)
+    click.echo('\n'.join(f'{r["schedule"]}: {r["started_on"]} - {r["finished_on"]}' for r in reservations))
 
 
 @cmd.command()
