@@ -38,7 +38,7 @@ def show_list():
     """宿の一覧を表示 """
     res = requests.get(BASE_URL + '/api/v1/yados')
     yados = json.loads(res.content)
-    click.echo('\n'.join(f'{yado["id"]}. {yado["name"]}' for yado in yados))
+    click.echo('\n'.join(('{}. {}'.format(yado["id"], yado["name"]) for yado in yados)))
 
 
 @cmd.command()
@@ -55,10 +55,11 @@ def cal(context):
     """宿の予約状況を表示 """
     if not context:
         context = 1
-    res = requests.get(BASE_URL + '/api/v1/yados/{context}/schedules')
+    res = requests.get(BASE_URL + '/api/v1/yados/{}/schedules'.format(context))
     reservations = json.loads(res.content)
     click.echo(
-        '\n'.join(f'{r["schedule"]}: {r["started_on"]} - {r["finished_on"]}' for r in reservations))
+        '\n'.join('{}: {} - {}'.format(r["schedule"], r["started_on"], r["finished_on"]) for r in
+                  reservations))
 
 
 @cmd.command()
@@ -68,8 +69,8 @@ def reserve(context):
     if not context:
         context = 1
     info = get_reservation_info()
-    res = requests.post(BASE_URL + f'api/v1/yados/{context}/reservations',
-                        data={f'reservation[{k}]': v for k, v in info.items()})
+    res = requests.post(BASE_URL + 'api/v1/yados/{}/reservations'.format(context),
+                        data={'reservation[{}]'.format(k): v for k, v in info.items()})
     click.echo(res.content)
     click.echo('done!!')
 
@@ -81,7 +82,8 @@ def get_reservation_info():
         info[i] = click.prompt(text, default=default, show_default=show_default)
 
     click.echo(RESERVATION_INFO.format(
-        '\n'.join((f'{i} {t[1]}: {info[t[0]]}' for i, t in enumerate(VALUE_TO_PROMPT)))))
+        '\n'.join(
+            ('{}. {}: {}'.format(i, t[1], info[t[0]]) for i, t in enumerate(VALUE_TO_PROMPT)))))
     confirm = click.prompt('confirm(Y/y) or edit(0-{})'.format(len(VALUE_TO_PROMPT) - 1))
     while confirm not in ('Y', 'y', 'YES', 'Yes', 'yes'):
         try:
@@ -91,7 +93,8 @@ def get_reservation_info():
         except:
             pass
         click.echo(RESERVATION_INFO.format(
-            '\n'.join((f'{i} {t[1]}: {info[t[0]]}' for i, t in enumerate(VALUE_TO_PROMPT)))))
+            '\n'.join(
+                ('{}. {}: {}'.format(i, t[1], info[t[0]]) for i, t in enumerate(VALUE_TO_PROMPT)))))
         confirm = click.prompt('confirm(Y/y) or edit(0-{}): '.format(len(VALUE_TO_PROMPT) - 1))
     return info
 
@@ -102,7 +105,7 @@ def me(token):
     """トークンから予約情報を受け取る """
     if not token:
         return
-    res = requests.get(BASE_URL + f'api/v1/me/{token}')
+    res = requests.get(BASE_URL + 'api/v1/me/{}'.format(token))
     if res.status_code == 404:
         click.echo('not found')
         return
