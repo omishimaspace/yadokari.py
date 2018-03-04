@@ -1,4 +1,5 @@
 import json
+import pprint
 
 import click
 import requests
@@ -50,7 +51,7 @@ def show(context):
 
 @cmd.command()
 @click.argument('context', nargs=1)
-def cal(context, year, month):
+def cal(context):
     """宿の予約状況を表示 """
     if not context:
         context = 1
@@ -61,7 +62,7 @@ def cal(context, year, month):
 
 
 @cmd.command()
-@click.argument('context', nargs=-1)
+@click.argument('context', nargs=1)
 def reserve(context):
     """宿の予約を行う """
     if not context:
@@ -102,7 +103,11 @@ def me(token):
     if not token:
         return
     res = requests.get(BASE_URL + f'api/v1/me/{token}')
-    click.echo(res.text)
+    if res.status_code == 404:
+        click.echo('not found')
+        return
+    info = json.loads(res.content)
+    pprint.pprint(info)
 
 
 def main():
