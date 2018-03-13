@@ -1,5 +1,10 @@
 from setuptools import setup
 
+
+with open('../README.rst') as f:
+    long_description = f.read()
+
+
 setup(
     name='yadokari',
     version='0.1.3',
@@ -7,9 +12,10 @@ setup(
     author_email='rhoboro@gmail.com',
     maintainer='rhoboro',
     maintainer_email='rhoboro@gmail.com',
-    license="MIT",
+    license='MIT',
     py_modules=['yadokari'],
     description='yadokari.py is a command line tool for yadokari reservation system.',
+    long_description=long_description,
     install_requires=[
         'Click<7.0',
         'requests<3.0',
@@ -25,3 +31,4 @@ setup(
         'License :: OSI Approved :: MIT License',
     ],
 )
+
